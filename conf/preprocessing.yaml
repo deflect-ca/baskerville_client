@@ -107,7 +107,7 @@ kafka:
 
   bootstrap_servers: !ENV '${KAFKA_HOST}' # deprecated soon
   consume_group: 'baskerville_client_x'
-  features_topic: 'features_from_client'
+  features_topic: 'features'
   publish_logs: 'baskerville.logs'
   publish_stats: 'baskerville.stats'
   publish_predictions: 'baskerville.predictions'
