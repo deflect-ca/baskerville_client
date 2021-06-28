@@ -58,8 +58,8 @@ services:
         target: /usr/share/filebeat/filebeat.yml
         read_only: true
       - type: bind
-        source: ./logs/apache2/
-        target: /var/log/apache2/
+        source: ./logs/
+        target: /var/log/
         read_only: true
     command: filebeat -e -strict.perms=false
     depends_on:
@@ -73,7 +73,6 @@ services:
     ports:
       - "2181:2181"
       - "2182:2182"
-      - "8080:8080"
 
   kafka:
     image: bitnami/kafka:2.8.0
