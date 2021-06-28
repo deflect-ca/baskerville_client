@@ -1,0 +1,30 @@
+filebeat.config:
+  modules:
+    path: ${path.config}/modules.d/*.yml
+    reload.enabled: true
+
+filebeat.inputs:
+  - type: log
+    enabled: true
+    paths:
+      - '/var/log/*.log'
+
+#processors:
+#  - drop_fields:
+#      fields: ["offset", "file", "agent", "version", "ephemeral_id", "ecs", "log"]
+#      ignore_missing: false
+
+output.logstash:
+  hosts: ["logstash:5044"]
+
+#output.kafka:
+#  hosts: ["kafka:9092"]
+#
+#  # message topic selection + partitioning
+#  topic: 'deflect.logs'
+#  partition.round_robin:
+#    reachable_only: false
+#
+#  required_acks: 1
+#  compression: gzip
+#  max_message_bytes: 1000000
