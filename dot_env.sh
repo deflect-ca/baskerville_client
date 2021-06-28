@@ -1,6 +1,7 @@
 
 ELK_VERSION=7.13.1
 
+KAFKA_HOST=localhost
 DOCKER_KAFKA_HOST=kafka
 CLEARING_HOUSE_KAFKA='localhost'
 
