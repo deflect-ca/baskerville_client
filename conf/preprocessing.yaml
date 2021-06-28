@@ -4,7 +4,7 @@ database:
   user: !ENV ${DB_USER}
   password: !ENV ${DB_PASSWORD}
   host: !ENV ${DB_HOST}
-  port : 5432
+  port : !ENV ${DB_PORT}
   type: 'postgres'
   data_partition: True
 
