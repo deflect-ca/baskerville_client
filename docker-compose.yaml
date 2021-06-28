@@ -3,17 +3,14 @@ version: '3.2'
 services:
   elasticsearch:
     build:
-      context: elasticsearch/
+      context: ./containers/elasticsearch
       args:
         ELK_VERSION: $ELK_VERSION
     volumes:
       - type: bind
-        source: ./elasticsearch/config/elasticsearch.yml
+        source: ./containers/elasticsearch/config/elasticsearch.yml
         target: /usr/share/elasticsearch/config/elasticsearch.yml
         read_only: true
-      - type: volume
-        source: elasticsearch
-        target: /usr/share/elasticsearch/data
     ports:
       - "9200:9200"
       - "9300:9300"
@@ -23,21 +20,19 @@ services:
       # Use single node discovery in order to disable production mode and avoid bootstrap checks.
       # see: https://www.elastic.co/guide/en/elasticsearch/reference/current/bootstrap-checks.html
       discovery.type: single-node
-    networks:
-      - baskerville
 
   logstash:
     build:
-      context: logstash/
+      context: ./containers/logstash
       args:
         ELK_VERSION: $ELK_VERSION
     volumes:
       - type: bind
-        source: ./logstash/config/logstash.yml
+        source: ./containers/logstash/config/logstash.yml
         target: /usr/share/logstash/config/logstash.yml
         read_only: true
       - type: bind
-        source: ./logstash/pipeline/logstash.conf
+        source: ./containers/logstash/pipeline/logstash.conf
         target: /usr/share/logstash/pipeline/logstash.conf
         read_only: true
     command: logstash -f /usr/share/logstash/pipeline/logstash.conf
@@ -48,19 +43,18 @@ services:
       - "9600:9600"
     environment:
       LS_JAVA_OPTS: "-Xmx256m -Xms256m"
-    networks:
-      - baskerville
     depends_on:
       - elasticsearch
+      - kafka
 
   filebeat:
     build:
-      context: filebeat/
+      context: ./containers/filebeat
       args:
         ELK_VERSION: $ELK_VERSION
     volumes:
       - type: bind
-        source: ./filebeat/config/filebeat.docker.yml
+        source: ./containers/filebeat/config/filebeat.docker.yml
         target: /usr/share/filebeat/filebeat.yml
         read_only: true
       - type: bind
@@ -68,38 +62,90 @@ services:
         target: /var/log/apache2/
         read_only: true
     command: filebeat -e -strict.perms=false
-    networks:
-      - baskerville
     depends_on:
       - logstash
       - kafka
 
   zookeeper:
-    image: hellgate75/zookeeper
+    image: bitnami/zookeeper:3.6.3
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
     ports:
       - "2181:2181"
       - "2182:2182"
       - "8080:8080"
 
   kafka:
-    build:
-      context: ./kafka
+    image: bitnami/kafka:2.8.0
+#    build:
+#      context: ./containers/kafka
     ports:
       - "9092:9092"
-      - "9093:9093"
+      - "29092:29092"
     environment:
-      KAFKA_ADVERTISED_HOST_NAME: ${DOCKER_KAFKA_HOST}  # before run: export DOCKER_KAFKA_HOST=$(ipconfig getifaddr en0)
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://${DOCKER_KAFKA_HOST}:9092
+      ALLOW_PLAINTEXT_LISTENER: "yes"
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_LISTENERS: PLAINTEXT://:9092,PLAINTEXT_HOST://:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://${DOCKER_KAFKA_HOST}:9092, PLAINTEXT_HOST://localhost:29092
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_BROKER_ID: 1
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     depends_on:
       - zookeeper
 
-networks:
+  postgres:
+    build:
+      context: ./containers/postgres
+      dockerfile: Dockerfile
+      shm_size: 2g
+    user: postgres
+    environment:
+      - TZ=GMT
+      - PGTZ=GMT
+      - POSTGRES_USER=${BASKERVILLE_POSTGRES_USER}
+      - POSTGRES_PASSWORD=${BASKERVILLE_POSTGRES_PASSWORD}
+    command: postgres -c log_destination='csvlog' -c logging_collector='on' -c log_filename='postgresql.log' -c log_statement='all' -c synchronous_commit=off
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data3:/var/lib/postgresql/data/
+
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+
   baskerville:
-    driver: bridge
+    image: $BASKERVILLE_IMAGE
+    environment:
+      - DB_USER=${BASKERVILLE_POSTGRES_USER}
+      - DB_PASSWORD=${BASKERVILLE_POSTGRES_PASSWORD}
+      - DB_HOST=postgres
+      - KAFKA_HOST=${DOCKER_KAFKA_HOST}:9092
+      - REDIS_PASSWORD=""
+      - CLEARING_HOUSE_KAFKA=${CLEARING_HOUSE_KAFKA}
+#    command: tail -f /dev/null
+    command: python3 /usr/local/baskerville/src/baskerville/main.py -c /app/baskerville/conf/preprocessing.yaml preprocessing
+    ports:
+      - "4040:4040"
+      - "4041:4041"
+    volumes:
+      - type: bind
+        source: ./conf
+        target: /app/baskerville/conf
+        read_only: true
+      - type: bind
+        source: ./clearing_house_connection
+        target: /app/baskerville/clearing_house_connection
+        read_only: true
+    depends_on:
+      - postgres
+      - kafka
+      - redis
+      - filebeat
 
 volumes:
-  elasticsearch:
+  postgres-data3:
+

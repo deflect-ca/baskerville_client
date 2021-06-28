@@ -1,4 +1,4 @@
-FROM wurstmeister/kafka:0.10.2.0-1
+FROM bitnami/kafka:2.8.0
 
 #ENV PASSWORD="kafkadocker"
 #
@@ -11,7 +11,7 @@ FROM wurstmeister/kafka:0.10.2.0-1
 #
 #RUN ./
 
-RUN echo "auto.create.topics.enable=true" > /opt/kafka/config/server.properties
+#RUN echo "auto.create.topics.enable=true" > /opt/kafka/config/server.properties
 #RUN /opt/kafka/bin/kafka-topics.sh --create --zookeeper $ZOOKEEPER --replication-factor 1 --partitions 10 --topic $BASKERVILLE_TOPIC --config retention.ms 120000
 
-EXPOSE 9092
+# EXPOSE 9092
