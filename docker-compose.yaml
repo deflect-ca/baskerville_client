@@ -89,6 +89,7 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_BROKER_ID: 1
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: true
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     depends_on:
@@ -130,9 +131,6 @@ services:
       - CLEARING_HOUSE_KAFKA=${CLEARING_HOUSE_KAFKA}
 #    command: tail -f /dev/null
     command: python3 /usr/local/baskerville/src/baskerville/main.py -c /app/baskerville/conf/preprocessing.yaml preprocessing
-    ports:
-      - "4040:4040"
-      - "4041:4041"
     volumes:
       - type: bind
         source: ./conf
