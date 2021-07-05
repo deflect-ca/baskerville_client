@@ -1,0 +1,136 @@
+---
+database:
+  name: baskerville
+  user: !ENV ${DB_USER}
+  password: !ENV ${DB_PASSWORD}
+  host: !ENV ${DB_HOST}
+  port : !ENV ${DB_PORT}
+  type: 'postgres'
+  data_partition: True
+
+user_details:
+  username: 'admin'
+  password: 'pass'
+  organization_uuid: 'test'
+  organization_name: 'test_org'
+
+engine:
+  client_mode: True
+  use_kafka_for_sensitive_data: False
+  kafka_send_by_partition: True
+  use_storage_for_request_cache: False
+  white_list_urls: []
+  white_list_ips: []
+  white_list_hosts: []
+  id_client: 'baskerville_client_x'
+  ttl: 480
+  time_bucket: 10
+  storage_path: ''
+  extra_features:
+      - host
+      - country
+      - host_country
+      - request_rate
+      - css_to_html_ratio
+      - image_to_html_ratio
+      - js_to_html_ratio
+      - minutes_total
+      - path_depth_average
+      - path_depth_variance
+      - payload_size_average
+      - payload_size_log_average
+      - request_interval_average
+      - request_interval_variance
+      - request_total
+      - response4xx_to_request_ratio
+      - top_page_to_request_ratio
+      - unique_path_rate
+      - unique_path_to_request_ratio
+      - unique_query_rate
+      - unique_query_to_unique_path_ratio
+      - unique_ua_rate
+  metrics:
+    port: 8998
+    performance:
+      pipeline:
+        - '_get_df'
+        - '_feature_extraction'
+        - '_group_by'
+        - '_predict'
+        - '_save'
+        - 'clean_cache'
+        - '_update'
+        - '_instantiate_spark_session'
+      request_set_cache:
+        - 'instantiate_cache'
+        - '__getitem__'
+        - '__contains__'
+        - 'clean'
+      features: True
+    progress: True
+  verbose: False
+  datetime_format: '%Y-%m-%d %H:%M:%S'
+
+  data_config:
+    parser: JSONLogSparkParser
+    schema: !ENV '${BASKERVILLE_ROOT}/data/samples/ats_log_schema.json'
+    group_by_cols:
+      - 'client_request_host'
+      - 'client_ip'
+    timestamp_column: '@timestamp'
+  use_spark: True
+  logpath : !ENV '${BASKERVILLE_ROOT}/src/baskerville/logs/baskerville.log'
+  log_level: 'DEBUG'
+  cache_expire_time: 1800    # sec (604800 = 1 week)
+  cache_load_past: False      # Load past request sets or not
+  cache_lookup: True          # search cache for sessions
+  cross_reference: False      # search MISP for IPs
+  db_lookup: False            # search database for sessions
+  manual_rawlog:
+    raw_logs_path:
+      - !ENV '${BASKERVILLE_ROOT}/data/samples/test_data_1k.json' # 1k randomized logs
+  simulation:
+    sleep: True
+    verbose: True
+
+kafka:
+  connection:
+    bootstrap_servers: !ENV '${KAFKA_HOST}'
+
+  clearing_house_connection:
+      bootstrap_servers: !ENV '${CLEARING_HOUSE_KAFKA}'
+      security_protocol: 'SSL'
+      ssl_check_hostname: False
+      ssl_cafile: '/app/baskerville/clearing_house_connection/caroot.pem'
+      ssl_certfile: '/app/baskerville/clearing_house_connection/certificate.pem'
+      ssl_keyfile: '/app/baskerville/clearing_house_connection/key.pem'
+
+  bootstrap_servers: !ENV '${KAFKA_HOST}' # deprecated soon
+  consume_group: 'baskerville_client_x'
+  features_topic: 'features'
+  publish_logs: 'baskerville.logs'
+  publish_stats: 'baskerville.stats'
+  publish_predictions: 'baskerville.predictions'
+
+
+spark:
+  kubernetes: False
+  redis_host: 'redis'
+#  redis_password: !ENV ${REDIS_PASSWORD}
+  app_name: 'Postprocessing'
+  master: 'local[2]'
+  parallelism: -1
+  log_conf: True
+  log_level: 'ERROR'
+  jars: !ENV '${BASKERVILLE_ROOT}/data/jars/hadoop-aws-2.7.1.jar,${BASKERVILLE_ROOT}/data/jars/aws-java-sdk-1.7.4.jar,${BASKERVILLE_ROOT}/data/jars/spark-streaming-kafka-0-8-assembly_2.11-2.4.0.jar,${BASKERVILLE_ROOT}/data/jars/spark-redis_2.11-2.5.0-SNAPSHOT-jar-with-dependencies.jar,${BASKERVILLE_ROOT}/data/jars/spark-iforest-2.4.0.99.jar,${BASKERVILLE_ROOT}/data/jars/postgresql-42.2.4.jar'
+  session_timezone: 'UTC'
+  shuffle_partitions: 4   # 2 * cores
+  db_driver: 'org.postgresql.Driver'
+  event_log: False
+  serializer: 'org.apache.spark.serializer.KryoSerializer'
+  kryoserializer_buffer_max: '2024m'
+  kryoserializer_buffer: '1024k'
+  storage_level: 'OFF_HEAP'
+  off_heap_size: '8g'
+  executor_extra_java_options: '-XX:ReservedCodeCacheSize=384m -XX:+UseCodeCacheFlushing -Xss512m -XX:+UseCompressedOops -XX:G1HeapRegionSize=10 -XX:+UseG1GC -XX:ParallelGCThreads=10 -XX:ConcGCThreads=2 -XX:InitiatingHeapOccupancyPercent=25'
+
