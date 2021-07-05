@@ -119,7 +119,7 @@ services:
     ports:
       - "6379:6379"
 
-  baskerville:
+  baskerville_preprocessing:
     image: $BASKERVILLE_IMAGE
     environment:
       - DB_USER=${BASKERVILLE_POSTGRES_USER}
@@ -129,8 +129,33 @@ services:
       - KAFKA_HOST=${DOCKER_KAFKA_HOST}:9092
       - REDIS_PASSWORD=""
       - CLEARING_HOUSE_KAFKA=${CLEARING_HOUSE_KAFKA}
-#    command: tail -f /dev/null
-    command: python3 /usr/local/baskerville/src/baskerville/main.py -c /app/baskerville/conf/preprocessing.yaml preprocessing
+    command: python3 /usr/local/baskerville/src/baskerville/main.py -c /app/baskerville/conf/baskerville.yaml preprocessing
+    volumes:
+      - type: bind
+        source: ./conf
+        target: /app/baskerville/conf
+        read_only: true
+      - type: bind
+        source: ./clearing_house_connection
+        target: /app/baskerville/clearing_house_connection
+        read_only: true
+    depends_on:
+      - postgres
+      - kafka
+      - redis
+      - filebeat
+
+  baskerville_postrocessing:
+    image: $BASKERVILLE_IMAGE
+    environment:
+      - DB_USER=${BASKERVILLE_POSTGRES_USER}
+      - DB_PASSWORD=${BASKERVILLE_POSTGRES_PASSWORD}
+      - DB_HOST=postgres
+      - DB_PORT=${BASKERVILLE_POSTGRES_PORT}
+      - KAFKA_HOST=${DOCKER_KAFKA_HOST}:9092
+      - REDIS_PASSWORD=""
+      - CLEARING_HOUSE_KAFKA=${CLEARING_HOUSE_KAFKA}
+    command: python3 /usr/local/baskerville/src/baskerville/main.py -c /app/baskerville/conf/baskerville.yaml postrocessing
     volumes:
       - type: bind
         source: ./conf
