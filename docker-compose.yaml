@@ -155,7 +155,7 @@ services:
       - KAFKA_HOST=${DOCKER_KAFKA_HOST}:9092
       - REDIS_PASSWORD=""
       - CLEARING_HOUSE_KAFKA=${CLEARING_HOUSE_KAFKA}
-    command: python3 /usr/local/baskerville/src/baskerville/main.py -c /app/baskerville/conf/baskerville.yaml postrocessing
+    command: python3 /usr/local/baskerville/src/baskerville/main.py -c /app/baskerville/conf/baskerville.yaml postprocessing
     volumes:
       - type: bind
         source: ./conf
