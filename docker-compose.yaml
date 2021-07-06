@@ -1,100 +1,100 @@
 version: '3.2'
 
 services:
-  elasticsearch:
-    build:
-      context: ./containers/elasticsearch
-      args:
-        ELK_VERSION: $ELK_VERSION
-    volumes:
-      - type: bind
-        source: ./containers/elasticsearch/config/elasticsearch.yml
-        target: /usr/share/elasticsearch/config/elasticsearch.yml
-        read_only: true
-    ports:
-      - "9200:9200"
-      - "9300:9300"
-    environment:
-      ES_JAVA_OPTS: "-Xmx256m -Xms256m"
-      ELASTIC_PASSWORD: changeme
-      # Use single node discovery in order to disable production mode and avoid bootstrap checks.
-      # see: https://www.elastic.co/guide/en/elasticsearch/reference/current/bootstrap-checks.html
-      discovery.type: single-node
-
-  logstash:
-    build:
-      context: ./containers/logstash
-      args:
-        ELK_VERSION: $ELK_VERSION
-    volumes:
-      - type: bind
-        source: ./containers/logstash/config/logstash.yml
-        target: /usr/share/logstash/config/logstash.yml
-        read_only: true
-      - type: bind
-        source: ./containers/logstash/pipeline/logstash.conf
-        target: /usr/share/logstash/pipeline/logstash.conf
-        read_only: true
-    command: logstash -f /usr/share/logstash/pipeline/logstash.conf
-    ports:
-      - "5044:5044"
-      - "5000:5000/tcp"
-      - "5000:5000/udp"
-      - "9600:9600"
-    environment:
-      LS_JAVA_OPTS: "-Xmx256m -Xms256m"
-    depends_on:
-      - elasticsearch
-      - kafka
-
-  filebeat:
-    build:
-      context: ./containers/filebeat
-      args:
-        ELK_VERSION: $ELK_VERSION
-    volumes:
-      - type: bind
-        source: ./containers/filebeat/config/filebeat.docker.yml
-        target: /usr/share/filebeat/filebeat.yml
-        read_only: true
-      - type: bind
-        source: ./logs/
-        target: /var/log/
-        read_only: true
-    command: filebeat -e -strict.perms=false
-    depends_on:
-      - logstash
-      - kafka
-
-  zookeeper:
-    image: bitnami/zookeeper:3.6.3
-    environment:
-      - ALLOW_ANONYMOUS_LOGIN=yes
-    ports:
-      - "2181:2181"
-      - "2182:2182"
-
-  kafka:
-    image: bitnami/kafka:2.8.0
+#  elasticsearch:
 #    build:
-#      context: ./containers/kafka
-    ports:
-      - "9092:9092"
-      - "29092:29092"
-    environment:
-      ALLOW_PLAINTEXT_LISTENER: "yes"
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_LISTENERS: PLAINTEXT://:9092,PLAINTEXT_HOST://:29092
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://${DOCKER_KAFKA_HOST}:9092, PLAINTEXT_HOST://${KAFKA_HOST}:29092
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_BROKER_ID: 1
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE: "true"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    depends_on:
-      - zookeeper
-
+#      context: ./containers/elasticsearch
+#      args:
+#        ELK_VERSION: $ELK_VERSION
+#    volumes:
+#      - type: bind
+#        source: ./containers/elasticsearch/config/elasticsearch.yml
+#        target: /usr/share/elasticsearch/config/elasticsearch.yml
+#        read_only: true
+#    ports:
+#      - "9200:9200"
+#      - "9300:9300"
+#    environment:
+#      ES_JAVA_OPTS: "-Xmx256m -Xms256m"
+#      ELASTIC_PASSWORD: changeme
+#      # Use single node discovery in order to disable production mode and avoid bootstrap checks.
+#      # see: https://www.elastic.co/guide/en/elasticsearch/reference/current/bootstrap-checks.html
+#      discovery.type: single-node
+#
+#  logstash:
+#    build:
+#      context: ./containers/logstash
+#      args:
+#        ELK_VERSION: $ELK_VERSION
+#    volumes:
+#      - type: bind
+#        source: ./containers/logstash/config/logstash.yml
+#        target: /usr/share/logstash/config/logstash.yml
+#        read_only: true
+#      - type: bind
+#        source: ./containers/logstash/pipeline/logstash.conf
+#        target: /usr/share/logstash/pipeline/logstash.conf
+#        read_only: true
+#    command: logstash -f /usr/share/logstash/pipeline/logstash.conf
+#    ports:
+#      - "5044:5044"
+#      - "5000:5000/tcp"
+#      - "5000:5000/udp"
+#      - "9600:9600"
+#    environment:
+#      LS_JAVA_OPTS: "-Xmx256m -Xms256m"
+#    depends_on:
+#      - elasticsearch
+#      - kafka
+#
+#  filebeat:
+#    build:
+#      context: ./containers/filebeat
+#      args:
+#        ELK_VERSION: $ELK_VERSION
+#    volumes:
+#      - type: bind
+#        source: ./containers/filebeat/config/filebeat.docker.yml
+#        target: /usr/share/filebeat/filebeat.yml
+#        read_only: true
+#      - type: bind
+#        source: ./logs/
+#        target: /var/log/
+#        read_only: true
+#    command: filebeat -e -strict.perms=false
+#    depends_on:
+#      - logstash
+#      - kafka
+#
+#  zookeeper:
+#    image: bitnami/zookeeper:3.6.3
+#    environment:
+#      - ALLOW_ANONYMOUS_LOGIN=yes
+#    ports:
+#      - "2181:2181"
+#      - "2182:2182"
+#
+#  kafka:
+#    image: bitnami/kafka:2.8.0
+##    build:
+##      context: ./containers/kafka
+#    ports:
+#      - "9092:9092"
+#      - "29092:29092"
+#    environment:
+#      ALLOW_PLAINTEXT_LISTENER: "yes"
+#      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+#      KAFKA_LISTENERS: PLAINTEXT://:9092,PLAINTEXT_HOST://:29092
+#      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://${DOCKER_KAFKA_HOST}:9092, PLAINTEXT_HOST://${KAFKA_HOST}:29092
+#      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+#      KAFKA_BROKER_ID: 1
+#      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+#      KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE: "true"
+#    volumes:
+#      - /var/run/docker.sock:/var/run/docker.sock
+#    depends_on:
+#      - zookeeper
+#
   postgres:
     build:
       context: ./containers/postgres
@@ -114,63 +114,81 @@ services:
     volumes:
       - postgres-data3:/var/lib/postgresql/data/
 
-  redis:
-    image: redis
-    ports:
-      - "6379:6379"
+  grafana:
+#      network_mode: host
+      build:
+          context: ./containers/grafana
+          dockerfile: Dockerfile
+          args:
+            - BASKERVILLE_DB=baskerville
+      user: "0"
+      ports:
+          - "3000:3000"
+      depends_on:
+        - postgres
+      volumes:
+        - volume-grafana3:/var/lib/grafana:Z
 
-  baskerville_preprocessing:
-    image: $BASKERVILLE_IMAGE
-    environment:
-      - DB_USER=${BASKERVILLE_POSTGRES_USER}
-      - DB_PASSWORD=${BASKERVILLE_POSTGRES_PASSWORD}
-      - DB_HOST=postgres
-      - DB_PORT=${BASKERVILLE_POSTGRES_PORT}
-      - KAFKA_HOST=${DOCKER_KAFKA_HOST}:9092
-      - REDIS_PASSWORD=""
-      - CLEARING_HOUSE_KAFKA=${CLEARING_HOUSE_KAFKA}
-    command: python3 /usr/local/baskerville/src/baskerville/main.py -c /app/baskerville/conf/preprocessing.yaml preprocessing
-    volumes:
-      - type: bind
-        source: ./conf
-        target: /app/baskerville/conf
-        read_only: true
-      - type: bind
-        source: ./clearing_house_connection
-        target: /app/baskerville/clearing_house_connection
-        read_only: true
-    depends_on:
-      - postgres
-      - kafka
-      - redis
-      - filebeat
-
-  baskerville_postrocessing:
-    image: $BASKERVILLE_IMAGE
-    environment:
-      - DB_USER=${BASKERVILLE_POSTGRES_USER}
-      - DB_PASSWORD=${BASKERVILLE_POSTGRES_PASSWORD}
-      - DB_HOST=postgres
-      - DB_PORT=${BASKERVILLE_POSTGRES_PORT}
-      - KAFKA_HOST=${DOCKER_KAFKA_HOST}:9092
-      - REDIS_PASSWORD=""
-      - CLEARING_HOUSE_KAFKA=${CLEARING_HOUSE_KAFKA}
-    command: python3 /usr/local/baskerville/src/baskerville/main.py -c /app/baskerville/conf/postprocessing.yaml postprocessing
-    volumes:
-      - type: bind
-        source: ./conf
-        target: /app/baskerville/conf
-        read_only: true
-      - type: bind
-        source: ./clearing_house_connection
-        target: /app/baskerville/clearing_house_connection
-        read_only: true
-    depends_on:
-      - postgres
-      - kafka
-      - redis
-      - filebeat
+#  redis:
+#    image: redis
+#    ports:
+#      - "6379:6379"
+#
+#  baskerville_preprocessing:
+#    image: $BASKERVILLE_IMAGE
+#    environment:
+#      - DB_USER=${BASKERVILLE_POSTGRES_USER}
+#      - DB_PASSWORD=${BASKERVILLE_POSTGRES_PASSWORD}
+#      - DB_HOST=postgres
+#      - DB_PORT=${BASKERVILLE_POSTGRES_PORT}
+#      - KAFKA_HOST=${DOCKER_KAFKA_HOST}:9092
+#      - REDIS_PASSWORD=""
+#      - CLEARING_HOUSE_KAFKA=${CLEARING_HOUSE_KAFKA}
+#    command: python3 /usr/local/baskerville/src/baskerville/main.py -c /app/baskerville/conf/preprocessing.yaml preprocessing
+#    volumes:
+#      - type: bind
+#        source: ./conf
+#        target: /app/baskerville/conf
+#        read_only: true
+#      - type: bind
+#        source: ./clearing_house_connection
+#        target: /app/baskerville/clearing_house_connection
+#        read_only: true
+#    depends_on:
+#      - postgres
+#      - kafka
+#      - redis
+#      - filebeat
+#
+#  baskerville_postrocessing:
+#    image: $BASKERVILLE_IMAGE
+#    environment:
+#      - DB_USER=${BASKERVILLE_POSTGRES_USER}
+#      - DB_PASSWORD=${BASKERVILLE_POSTGRES_PASSWORD}
+#      - DB_HOST=postgres
+#      - DB_PORT=${BASKERVILLE_POSTGRES_PORT}
+#      - KAFKA_HOST=${DOCKER_KAFKA_HOST}:9092
+#      - REDIS_PASSWORD=""
+#      - CLEARING_HOUSE_KAFKA=${CLEARING_HOUSE_KAFKA}
+#    command: python3 /usr/local/baskerville/src/baskerville/main.py -c /app/baskerville/conf/postprocessing.yaml postprocessing
+#    volumes:
+#      - type: bind
+#        source: ./conf
+#        target: /app/baskerville/conf
+#        read_only: true
+#      - type: bind
+#        source: ./clearing_house_connection
+#        target: /app/baskerville/clearing_house_connection
+#        read_only: true
+#    depends_on:
+#      - postgres
+#      - kafka
+#      - redis
+#      - filebeat
 
 volumes:
   postgres-data3:
+
+  volume-grafana3:
+
 
