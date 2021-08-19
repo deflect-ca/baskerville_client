@@ -24,7 +24,7 @@ datasources:
   # <string> custom UID which can be used to reference this datasource in other parts of the configuration, if not specified will be generated automatically
   uid: my_unique_uid2
   # <string> url
-  url: postgres:5433
+  url: postgres:5432
   # <string> Deprecated, use secureJsonData.password
 #  password: changeme
   # <string> database user, if used
