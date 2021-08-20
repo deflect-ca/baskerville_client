@@ -20,6 +20,7 @@ Baskeville client is a client module which
 cp dot_env.sh .env
 ```
 * set `CLEARING_HOUSE_KAFKA` variable to your Baskerville clearing house url
+* set `KAFKA_HOST` variable to your ip
 
 * add TLS keys provided by clearing house into 'clearing_house_connection' subfolder. 
 ```commandline
@@ -46,7 +47,7 @@ engine:
 
 * Provide clearing house with your `client_id` and your kafka external url:
 ```yaml
-your_ip:9092
+your_ip:29092
 ```
 
 * Change your postgres password in `.env`
