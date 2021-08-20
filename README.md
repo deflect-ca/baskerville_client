@@ -72,6 +72,6 @@ ENV GF_SECURITY_ADMIN_PASSWORD ...
 docker-compose up -d
 ```
 
-* Open Grafana dashboard at `localhost:9092` and login with your Grafana admin password. 
+* Open Grafana dashboard at `localhost:3000` and login with your Grafana admin password. 
 
 * Open dashboard `baskerville/Attack` and `baskerville/TrafficLight
