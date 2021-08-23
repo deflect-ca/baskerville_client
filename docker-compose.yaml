@@ -160,6 +160,10 @@ services:
       - kafka
       - redis
       - filebeat
+    ports:
+      - "4040:4040"
+      - "4041:4041"
+      - "8080:8080"
 
   baskerville_postrocessing:
     image: $BASKERVILLE_IMAGE
