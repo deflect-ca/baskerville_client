@@ -35,8 +35,8 @@ filebeat.inputs:
 #      fields: ["offset", "file", "agent", "version", "ephemeral_id", "ecs", "log"]
 #      ignore_missing: false
 
-output.logstash:
-  hosts: ["logstash:5044"]
+#output.logstash:
+#  hosts: ["logstash:5044"]
 
 # for debugging purposes:
 output.file:
