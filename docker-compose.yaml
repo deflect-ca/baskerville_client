@@ -61,6 +61,14 @@ services:
         source: ./logs/
         target: /var/log/
         read_only: true
+      - type: bind
+        source: /var/run/
+        target: /var/run/
+        read_only: false
+      - type: bind
+        source: /var/lib/docker/containers/
+        target: /var/lib/docker/containers/
+        read_only: true
     command: filebeat -e -strict.perms=false
     depends_on:
       - logstash
