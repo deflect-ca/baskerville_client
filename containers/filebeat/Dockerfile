@@ -1,4 +1,5 @@
 ARG ELK_VERSION
+ARG DEFLECT_DNET
 
 FROM docker.elastic.co/beats/filebeat:${ELK_VERSION}
 
