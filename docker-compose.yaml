@@ -108,7 +108,9 @@ services:
     build:
       context: ./containers/postgres
       dockerfile: Dockerfile
-      shm_size: 2g
+    env_file:
+      - .env
+    shm_size: 2g
     user: postgres
     environment:
       - TZ=GMT
@@ -174,8 +176,10 @@ services:
       - "4041:4041"
       - "8081:8080"
 
-  baskerville_postrocessing:
+  baskerville_postprocessing:
     image: $BASKERVILLE_IMAGE
+    env_file:
+      - .env
     environment:
       - DB_USER=${BASKERVILLE_POSTGRES_USER}
       - DB_PASSWORD=${BASKERVILLE_POSTGRES_PASSWORD}
