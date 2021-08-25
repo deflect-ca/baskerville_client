@@ -7,7 +7,7 @@ filebeat.inputs:
   - type: log
     enabled: true
     paths:
-      - '/var/log/banjax-next/banjax-next-format.log'
+      - '/var/log/banjax-next/nginx-logstash-format.log'
 #  - type: docker
 #    combine_partial: true
 #    containers:
