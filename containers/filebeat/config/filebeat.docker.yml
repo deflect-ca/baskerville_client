@@ -16,7 +16,7 @@ filebeat.inputs:
       ids:
         - "*"
     fields:
-      dnet: "${DEFLECT_DNET}"
+      dnet: "dnet1"
     processors:
       - add_docker_metadata:
           host: "unix:///var/run/docker.sock"

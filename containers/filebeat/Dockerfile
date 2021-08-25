@@ -8,7 +8,6 @@ ENV DEFLECT_DNET $DEFLECT_DNET
 
 USER root
 
-RUN echo $DEFLECT_DNET && echo ${ELK_VERSION}
 # COPY filebeat.yml /usr/share/filebeat/filebeat.yml
 # COPY output.json /usr/share/filebeat/output.json
 # USER root
