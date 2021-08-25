@@ -1,13 +1,11 @@
 ARG ELK_VERSION
 ARG DEFLECT_DNET
 
-ENV DNET=$DEFLECT_DNET
-
 FROM docker.elastic.co/beats/filebeat:${ELK_VERSION}
 
 USER root
 
-RUN echo $DNET && echo ${ELK_VERSION}
+RUN echo DEFLECT_DNET && echo ${ELK_VERSION}
 # COPY filebeat.yml /usr/share/filebeat/filebeat.yml
 # COPY output.json /usr/share/filebeat/output.json
 # USER root
