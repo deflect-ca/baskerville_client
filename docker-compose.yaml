@@ -61,10 +61,6 @@ services:
       - type: bind
         source: ./logs/
         target: /var/log/
-        read_only: true
-      - type: bind
-        source: /var/log/filebeat
-        target: /var/log/filebeat
         read_only: false
       - type: bind
         source: /var/run/
