@@ -52,6 +52,7 @@ services:
       context: ./containers/filebeat
       args:
         ELK_VERSION: $ELK_VERSION
+        DEFLECT_DNET: $DEFLECT_DNET
     volumes:
       - type: bind
         source: ./containers/filebeat/config/filebeat.docker.yml
