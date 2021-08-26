@@ -11,7 +11,7 @@ global_decision_lists:
 iptables_ban_seconds: 10
 iptables_unbanner_seconds: 5
 kafka_brokers:
-  - "localhost:9092"
+  - "kafka:9092"
 kafka_security_protocol: 'ssl'
 kafka_ssl_ca: "/etc/banjax-next/caroot.pem"
 kafka_ssl_cert: "/etc/banjax-next/certificate.pem"
