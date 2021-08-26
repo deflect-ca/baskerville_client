@@ -6,6 +6,8 @@ services:
       context: ./containers/elasticsearch
       args:
         ELK_VERSION: $ELK_VERSION
+    env_file:
+      - .env
     volumes:
       - type: bind
         source: ./containers/elasticsearch/config/elasticsearch.yml
@@ -26,6 +28,8 @@ services:
       context: ./containers/logstash
       args:
         ELK_VERSION: $ELK_VERSION
+    env_file:
+      - .env
     volumes:
       - type: bind
         source: ./containers/logstash/config/logstash.yml
@@ -131,6 +135,8 @@ services:
           dockerfile: Dockerfile
           args:
             - BASKERVILLE_DB=baskerville
+      env_file:
+        - .env
       user: "0"
       ports:
           - "3000:3000"
@@ -141,6 +147,8 @@ services:
 
   redis:
     image: redis
+    env_file:
+      - .env
     ports:
       - "6379:6379"
     volumes:
@@ -148,6 +156,8 @@ services:
 
   baskerville_preprocessing:
     image: $BASKERVILLE_IMAGE
+    env_file:
+      - .env
     environment:
       - DB_USER=${BASKERVILLE_POSTGRES_USER}
       - DB_PASSWORD=${BASKERVILLE_POSTGRES_PASSWORD}
@@ -203,6 +213,35 @@ services:
       - kafka
       - redis
       - filebeat
+  banjax-next:
+    build:
+      context: ./containers/banjax-next
+      dockerfile: Dockerfile
+    # this uses the nginx network namespace so it can set iptables rules
+    # in the right place. the go app listens on port 8081
+    network_mode: "service:nginx"
+    cap_add:
+      - NET_ADMIN  # we use iptables for banning
+    volumes:
+      - /var/log/banjax-next/:/var/log/banjax-next/
+
+  nginx:
+    build:
+      context: ./containers/nginx
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    volumes:
+      - /var/log/banjax-next/:/var/log/banjax-next/
+      - /var/log/nginx/:/var/log/nginx/
+
+  test-origin:
+    build:
+      context: ./containers/test-origin
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+
 
 volumes:
   postgres-data3:
