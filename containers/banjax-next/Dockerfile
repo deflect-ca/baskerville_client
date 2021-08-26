@@ -11,15 +11,13 @@ RUN set -x \
  && DEBIAN_FRONTEND=noninteractive apt-get install -y \
 		iptables
 
-RUN mkdir -p /opt/banjax-next
-COPY ./ /opt/banjax-next/
-RUN cd /opt/banjax-next && go test
+RUN cd /opt && git clone https://github.com/equalitie/banjax-next.git && cd banjax-next && go test
 
 RUN mkdir -p /etc/banjax-next
 COPY ./banjax-next-config.yaml /etc/banjax-next/
-COPY ./caroot.pem /etc/banjax-next/
-COPY ./certificate.pem /etc/banjax-next/
-COPY ./key.pem /etc/banjax-next/
+#COPY ./caroot.pem /etc/banjax-next/
+#COPY ./certificate.pem /etc/banjax-next/
+#COPY ./key.pem /etc/banjax-next/
 
 RUN mkdir -p /var/log/banjax-next
 RUN touch /var/log/banjax-next/ban_ip_list.log
