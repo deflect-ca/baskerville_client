@@ -59,7 +59,7 @@ services:
         DEFLECT_DNET: dnet1
     volumes:
       - type: bind
-        source: ./config/filebeat.docker.yml
+        source: ./containers/filebeat/config/filebeat.docker.yml
         target: /usr/share/filebeat/filebeat.yml
         read_only: true
       - type: bind
