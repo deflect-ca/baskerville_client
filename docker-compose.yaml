@@ -55,15 +55,15 @@ services:
     build:
       context: ./containers/filebeat
       args:
-        ELK_VERSION: $ELK_VERSION
+        ELK_VERSION: ${ELK_VERSION}
         DEFLECT_DNET: dnet1
     volumes:
       - type: bind
-        source: ./containers/filebeat/config/filebeat.docker.yml
+        source: ./config/filebeat.docker.yml
         target: /usr/share/filebeat/filebeat.yml
         read_only: true
       - type: bind
-        source: ./logs/
+        source: /var/log/
         target: /var/log/
         read_only: false
       - type: bind
