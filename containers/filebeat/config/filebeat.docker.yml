@@ -2,14 +2,13 @@ filebeat.config:
   modules:
     path: ${path.config}/modules.d/*.yml
     reload.enabled: true
-filebeat.logging:
-  logging.level: info
-  logging.to_files: true
-  logging.files:
-    path: /var/log/filebeat
-    name: filebeat
-    keepfiles: 7
-    permissions: 0644
+logging.level: info
+logging.to_files: true
+logging.files:
+  path: /var/log
+  name: filebeat
+  keepfiles: 7
+  permissions: 0644
 
 filebeat.inputs:
   - type: log

@@ -15,6 +15,7 @@ RUN cd /opt && git clone https://github.com/equalitie/banjax-next.git && cd banj
 
 RUN mkdir -p /etc/banjax-next
 COPY ./banjax-next-config.yaml /etc/banjax-next/
+# for Kafka - Baskerville # TODO: should be optional
 COPY ./caroot.pem /etc/banjax-next/
 COPY ./certificate.pem /etc/banjax-next/
 COPY ./key.pem /etc/banjax-next/

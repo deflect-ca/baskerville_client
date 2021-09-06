@@ -77,7 +77,7 @@ services:
     command: filebeat -e -strict.perms=false
     depends_on:
       - logstash
-      - kafka
+#      - kafka
 
   zookeeper:
     image: bitnami/zookeeper:3.6.3
@@ -155,7 +155,7 @@ services:
       - /tmp:/data
 
   baskerville_preprocessing:
-    image: $BASKERVILLE_IMAGE
+    image: "${BASKERVILLE_IMAGE}"
     env_file:
       - .env
     environment:
@@ -187,7 +187,7 @@ services:
       - "8081:8080"
 
   baskerville_postprocessing:
-    image: $BASKERVILLE_IMAGE
+    image: "${BASKERVILLE_IMAGE}"
     env_file:
       - .env
     environment:
@@ -213,6 +213,7 @@ services:
       - kafka
       - redis
       - filebeat
+
   banjax-next:
     build:
       context: ./containers/banjax-next
