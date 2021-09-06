@@ -5,7 +5,7 @@ filebeat.config:
 logging.level: info
 logging.to_files: true
 logging.files:
-  path: /var/log
+  path: /var/log/filebeat
   name: filebeat
   keepfiles: 7
   permissions: 0644
