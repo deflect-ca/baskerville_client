@@ -98,12 +98,12 @@ kafka:
     bootstrap_servers: !ENV '${KAFKA_HOST}'
 
   clearing_house_connection:
-      bootstrap_servers: !ENV '${CLEARING_HOUSE_KAFKA}:29092'
-      security_protocol: 'SSL'
-      ssl_check_hostname: False
-      ssl_cafile: '/app/baskerville/clearing_house_connection/caroot.pem'
-      ssl_certfile: '/app/baskerville/clearing_house_connection/certificate.pem'
-      ssl_keyfile: '/app/baskerville/clearing_house_connection/key.pem'
+      bootstrap_servers: !ENV '${CLEARING_HOUSE_KAFKA}'
+#      security_protocol: 'SSL'
+#      ssl_check_hostname: False
+#      ssl_cafile: '/app/baskerville/clearing_house_connection/caroot.pem'
+#      ssl_certfile: '/app/baskerville/clearing_house_connection/certificate.pem'
+#      ssl_keyfile: '/app/baskerville/clearing_house_connection/key.pem'
 
   bootstrap_servers: !ENV '${KAFKA_HOST}' # deprecated soon
   consume_group: 'baskerville_client_x'
