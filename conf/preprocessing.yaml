@@ -96,6 +96,11 @@ engine:
 kafka:
   connection:
     bootstrap_servers: !ENV '${KAFKA_HOST}'
+    security_protocol: 'SSL'
+    ssl_check_hostname: False
+    ssl_cafile: '/app/baskerville/clearing_house_connection/caroot.pem'
+    ssl_certfile: '/app/baskerville/clearing_house_connection/certificate.pem'
+    ssl_keyfile: '/app/baskerville/clearing_house_connection/key.pem'
 
   clearing_house_connection:
       bootstrap_servers: !ENV '${CLEARING_HOUSE_KAFKA}'
