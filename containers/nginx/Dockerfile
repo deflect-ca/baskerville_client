@@ -1,6 +1,6 @@
-# Copyright (c) 2021, eQualit.ie inc.
+# Copyright (c) 2020, eQualit.ie inc.
 # All rights reserved.
-# 
+#
 # This source code is licensed under the BSD-style license found in the
 # LICENSE file in the root directory of this source tree.
 
@@ -68,7 +68,6 @@ COPY --from=purge-plugin-build-target \
     /root/nginx/objs/ngx_http_cache_purge_module.so \
     /usr/lib/nginx/modules/ngx_http_cache_purge_module_torden.so
 
-ADD ./sites.d /etc/nginx/sites.d
 COPY nginx.conf /etc/nginx/
 
 RUN mkdir -p /etc/ssl/sites
