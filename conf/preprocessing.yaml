@@ -104,7 +104,6 @@ kafka:
       ssl_cafile: '/app/baskerville/clearing_house_connection/caroot.pem'
       ssl_certfile: '/app/baskerville/clearing_house_connection/certificate.pem'
       ssl_keyfile: '/app/baskerville/clearing_house_connection/key.pem'
-  predictions_topic: 'predictions.baskerville_client_x'
   bootstrap_servers: !ENV '${KAFKA_HOST}' # deprecated soon
   consume_group: 'baskerville_client_x'
   features_topic: 'features'
