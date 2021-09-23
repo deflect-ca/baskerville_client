@@ -225,6 +225,8 @@ services:
       - NET_ADMIN  # we use iptables for banning
     volumes:
       - /var/log/banjax-next/:/var/log/banjax-next/
+    networks:
+      - local
 
   nginx:
     build:
@@ -235,6 +237,8 @@ services:
     volumes:
       - /var/log/banjax-next/:/var/log/banjax-next/
       - /var/log/nginx/:/var/log/nginx/
+    networks:
+      - local
 
   test-origin:
     build:
@@ -242,6 +246,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8080:8080"
+    networks:
+      - local
 
 
 volumes:
@@ -249,4 +255,6 @@ volumes:
 
   volume-grafana3:
 
-
+networks:
+  local:
+    driver: bridge
