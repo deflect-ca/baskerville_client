@@ -11,7 +11,7 @@ RUN set -x \
  && DEBIAN_FRONTEND=noninteractive apt-get install -y \
 		iptables
 
-RUN cd /opt && git clone https://github.com/equalitie/banjax-next.git && cd banjax-next && go test
+RUN cd /opt && git clone https://github.com/equalitie/banjax.git && cd banjax && go test
 
 RUN mkdir -p /etc/banjax-next
 COPY ./banjax-next-config.yaml /etc/banjax-next/
