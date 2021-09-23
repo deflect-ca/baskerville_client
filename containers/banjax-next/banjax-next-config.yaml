@@ -12,11 +12,11 @@ iptables_ban_seconds: 10
 iptables_unbanner_seconds: 5
 kafka_brokers:
   - "kafka:9092"
-kafka_security_protocol: 'ssl'
-kafka_ssl_ca: "/etc/banjax-next/caroot.pem"
-kafka_ssl_cert: "/etc/banjax-next/certificate.pem"
-kafka_ssl_key: "/etc/banjax-next/key.pem"
-kafka_ssl_key_password: password
+#kafka_security_protocol: 'ssl'
+#kafka_ssl_ca: "/etc/banjax-next/caroot.pem"
+#kafka_ssl_cert: "/etc/banjax-next/certificate.pem"
+#kafka_ssl_key: "/etc/banjax-next/key.pem"
+#kafka_ssl_key_password: password
 kafka_report_topic: 'banjax_report_topic'
 kafka_command_topic: 'banjax_command_topic'
 password_protected_paths:
