@@ -56,7 +56,7 @@ regexes_with_rates:
     interval: 1
     regex: ^GET.*allowme.*
     rule: "unblock backdoor"
-  - decision: nginx_block
+  - decision: iptables_block
     hits_per_interval: 0
     interval: 1
     regex: ^GET.*blockme.*
