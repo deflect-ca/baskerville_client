@@ -220,7 +220,7 @@ services:
       dockerfile: Dockerfile
     # this uses the nginx network namespace so it can set iptables rules
     # in the right place. the go app listens on port 8081
-    network_mode: "service:nginx"
+    # network_mode: "service:nginx"
     cap_add:
       - NET_ADMIN  # we use iptables for banning
     volumes:
