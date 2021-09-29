@@ -2,12 +2,41 @@ filebeat.config:
   modules:
     path: ${path.config}/modules.d/*.yml
     reload.enabled: true
+logging:
+     level: debug
+     to_files: true
+     files:
+        path: /var/log/filebeat
+        name: filebeat.log
+        rotateeverybytes: 51002
+        keepfiles: 7
 
 filebeat.inputs:
   - type: log
     enabled: true
     paths:
-      - '/var/log/*.log'
+      - '/var/log/banjax-next/nginx-logstash-format.log'
+#  - type: docker
+#    combine_partial: true
+#    containers:
+#      path: "/var/lib/docker/containers"
+#      stream: "stdout"
+#      ids:
+#        - "*"
+#    fields:
+#      dnet: "dnet1"
+#    processors:
+#      - add_docker_metadata:
+#          host: "unix:///var/run/docker.sock"
+#      - decode_json_fields:
+#          fields: [ "message" ]
+#          target: "decoded_message"
+#          add_error_key: true
+#      - convert:
+#          fields:
+#            - { from: "decoded_message.ngx_request_time", to: "ngx_request_time", type: "float" }
+#          ignore_missing: true
+#          fail_on_error: false
 
 #processors:
 #  - drop_fields:
@@ -16,6 +45,31 @@ filebeat.inputs:
 
 output.logstash:
   hosts: ["logstash:5044"]
+
+## for debugging purposes:
+#output.file:
+#  # Boolean flag to enable or disable the output module.
+#  enabled: true
+#
+#  # Path to the directory where to save the generated files. The option is
+#  # mandatory.
+#  path: "/var/log/filebeat"
+#
+#  # Name of the generated files. The default is `filebeat` and it generates
+#  # files: `filebeat`, `filebeat.1`, `filebeat.2`, etc.
+#  filename: filebeat
+#
+#  # Maximum size in kilobytes of each file. When this size is reached, and on
+#  # every filebeat restart, the files are rotated. The default value is 10240
+#  # kB.
+#  rotate_every_kb: 10000
+#
+#  # Maximum number of files under path. When this number of files is reached,
+#  # the oldest file is deleted and the rest are shifted from last to first. The
+#  # default is 7 files.
+#  number_of_files: 7
+#
+#
 
 #output.kafka:
 #  hosts: ["kafka:9092"]

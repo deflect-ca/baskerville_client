@@ -6,6 +6,8 @@ services:
       context: ./containers/elasticsearch
       args:
         ELK_VERSION: $ELK_VERSION
+    env_file:
+      - .env
     volumes:
       - type: bind
         source: ./containers/elasticsearch/config/elasticsearch.yml
@@ -26,6 +28,8 @@ services:
       context: ./containers/logstash
       args:
         ELK_VERSION: $ELK_VERSION
+    env_file:
+      - .env
     volumes:
       - type: bind
         source: ./containers/logstash/config/logstash.yml
@@ -51,20 +55,29 @@ services:
     build:
       context: ./containers/filebeat
       args:
-        ELK_VERSION: $ELK_VERSION
+        ELK_VERSION: ${ELK_VERSION}
+        DEFLECT_DNET: dnet1
     volumes:
       - type: bind
         source: ./containers/filebeat/config/filebeat.docker.yml
         target: /usr/share/filebeat/filebeat.yml
         read_only: true
       - type: bind
-        source: ./logs/
+        source: /var/log/
         target: /var/log/
+        read_only: false
+      - type: bind
+        source: /var/run/
+        target: /var/run/
+        read_only: false
+      - type: bind
+        source: /var/lib/docker/containers/
+        target: /var/lib/docker/containers/
         read_only: true
     command: filebeat -e -strict.perms=false
     depends_on:
       - logstash
-      - kafka
+#      - kafka
 
   zookeeper:
     image: bitnami/zookeeper:3.6.3
@@ -99,7 +112,9 @@ services:
     build:
       context: ./containers/postgres
       dockerfile: Dockerfile
-      shm_size: 2g
+    env_file:
+      - .env
+    shm_size: 2g
     user: postgres
     environment:
       - TZ=GMT
@@ -120,6 +135,8 @@ services:
           dockerfile: Dockerfile
           args:
             - BASKERVILLE_DB=baskerville
+      env_file:
+        - .env
       user: "0"
       ports:
           - "3000:3000"
@@ -130,13 +147,17 @@ services:
 
   redis:
     image: redis
+    env_file:
+      - .env
     ports:
       - "6379:6379"
     volumes:
       - /tmp:/data
 
   baskerville_preprocessing:
-    image: $BASKERVILLE_IMAGE
+    image: "${BASKERVILLE_IMAGE}"
+    env_file:
+      - .env
     environment:
       - DB_USER=${BASKERVILLE_POSTGRES_USER}
       - DB_PASSWORD=${BASKERVILLE_POSTGRES_PASSWORD}
@@ -160,9 +181,15 @@ services:
       - kafka
       - redis
       - filebeat
+    ports:
+      - "4040:4040"
+      - "4041:4041"
+      - "8081:8080"
 
-  baskerville_postrocessing:
-    image: $BASKERVILLE_IMAGE
+  baskerville_postprocessing:
+    image: "${BASKERVILLE_IMAGE}"
+    env_file:
+      - .env
     environment:
       - DB_USER=${BASKERVILLE_POSTGRES_USER}
       - DB_PASSWORD=${BASKERVILLE_POSTGRES_PASSWORD}
@@ -187,9 +214,50 @@ services:
       - redis
       - filebeat
 
+  banjax-next:
+    build:
+      context: ./containers/banjax-next
+      dockerfile: Dockerfile
+    # this uses the nginx network namespace so it can set iptables rules
+    # in the right place. the go app listens on port 8081
+    # network_mode: "service:nginx"
+    cap_add:
+      - NET_ADMIN  # we use iptables for banning
+    volumes:
+      - /var/log/banjax-next/:/var/log/banjax-next/
+    networks:
+      - local
+      - default
+
+  nginx:
+    build:
+      context: ./containers/nginx
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    volumes:
+      - /var/log/banjax-next/:/var/log/banjax-next/
+      - /var/log/nginx/:/var/log/nginx/
+    networks:
+      - local
+      - default
+
+  test-origin:
+    build:
+      context: ./containers/test-origin
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    networks:
+      - local
+      - default
+
+
 volumes:
   postgres-data3:
 
   volume-grafana3:
 
-
+networks:
+  local:
+    driver: bridge
