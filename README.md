@@ -75,3 +75,38 @@ docker-compose up -d
 * Open Grafana dashboard at `localhost:3000` and login with your Grafana admin password. 
 
 * Open dashboard `baskerville/Attack` and `baskerville/TrafficLight
+
+To verify kafka is receiving logs:
+- First open your browser at `http://localhost/test` (or any other similar url) and refresh a few times
+- Verify that your requests were written to the right file:
+  ```bash
+  tail -f /var/log/banjax/nginx-logstash-format.log
+  ```
+- Check your filebeat and logstash logs for any errors if necessary:
+```bash
+docker-compose logs -f logstash
+docker-compose logs -f filebeat 
+```
+- Then login to the kafka service and consume a few messages from the logs topic, e.g. `deflect.logs`:
+```bash
+docker-compose exec kafka bash
+# this will provide the message count, e.g. partition 0 has 6131 messages
+# so not zero message count means we are receiving correctly
+/opt/bitnami/kafka/bin/kafka-run-class.sh kafka.tools.GetOffsetShell --broker-list localhost:9092 --topic deflect.logs
+>>> deflect.logs:0:6131
+
+# the following will consume / display a few messages, just to make sure all is well
+/opt/bitnami/kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic deflect.logs --offset 6131 --partition 0
+```
+
+### Misc
+In case baskerville_preprocessing and baskerville_postprocessing fail to start because `baskerville` database does not exist:
+```bash
+docker-compose exec postgres bash
+psql
+CREATE DATABASE baskerville;
+\q
+exit
+
+docker-compose restart baskerville_preprocessing baskerville_postprocessing
+```
