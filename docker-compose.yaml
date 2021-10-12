@@ -226,7 +226,7 @@ services:
       - NET_ADMIN  # we use iptables for banning
     volumes:
       - type: bind
-        source: ${PROJECT_ROOT}/logs/banjax-next/
+        source: /var/log/banjax-next/
         target: /var/log/banjax-next/
         read_only: false
     depends_on:
@@ -240,7 +240,7 @@ services:
       - "80:80"
     volumes:
       - type: bind
-        source: ${PROJECT_ROOT}/logs/banjax-next/
+        source: /var/log/banjax-next/
         target: /var/log/banjax-next/
         read_only: false
       - type: bind
