@@ -220,14 +220,17 @@ services:
       dockerfile: Dockerfile
     # this uses the nginx network namespace so it can set iptables rules
     # in the right place. the go app listens on port 8081
-    # network_mode: "service:nginx"
+    network_mode: "service:nginx"
+    user: root
     cap_add:
       - NET_ADMIN  # we use iptables for banning
     volumes:
-      - /var/log/banjax-next/:/var/log/banjax-next/
-    networks:
-      - local
-      - default
+      - type: bind
+        source: ${PROJECT_ROOT}/logs/banjax-next/
+        target: /var/log/banjax-next/
+        read_only: false
+    depends_on:
+      - nginx
 
   nginx:
     build:
@@ -236,21 +239,24 @@ services:
     ports:
       - "80:80"
     volumes:
-      - /var/log/banjax-next/:/var/log/banjax-next/
-      - /var/log/nginx/:/var/log/nginx/
+      - type: bind
+        source: ${PROJECT_ROOT}/logs/banjax-next/
+        target: /var/log/banjax-next/
+        read_only: false
+      - type: bind
+        source: /var/log/nginx/
+        target: /var/log/nginx/
+        read_only: false
     networks:
       - local
-      - default
 
   test-origin:
     build:
       context: ./containers/test-origin
       dockerfile: Dockerfile
-    ports:
-      - "8080:8080"
-    networks:
-      - local
-      - default
+#    ports:
+#      - "8080:8080"
+    network_mode: "service:nginx"
 
 
 volumes:

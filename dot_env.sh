@@ -9,3 +9,5 @@ BASKERVILLE_IMAGE=equalitie/baskerville:latest
 BASKERVILLE_POSTGRES_USER=postgres
 BASKERVILLE_POSTGRES_PASSWORD=changeme
 BASKERVILLE_POSTGRES_PORT=5432
+
+PROJECT_ROOT='/path/to/baskerville_client'
