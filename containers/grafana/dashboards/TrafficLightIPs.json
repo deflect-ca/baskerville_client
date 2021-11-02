@@ -33,6 +33,12 @@
       "id": "stat",
       "name": "Stat",
       "version": ""
+    },
+    {
+      "type": "panel",
+      "id": "table-old",
+      "name": "Table (old)",
+      "version": ""
     }
   ],
   "annotations": {
@@ -52,13 +58,13 @@
   "gnetId": null,
   "graphTooltip": 0,
   "id": null,
-  "iteration": 1635859308425,
+  "iteration": 1635859230385,
   "links": [],
   "panels": [
     {
       "aliasColors": {
         "anomalies": "yellow",
-        "anomaly": "semi-dark-red",
+        "anomaly": "semi-dark-yellow",
         "attack": "dark-red",
         "baskerville_prediction_count{instance=\"23.239.118.130:8998\",job=\"baskerville_exporter\",kind=\"anomaly\",target=\"www.btselem.org\"}": "dark-red",
         "baskerville_prediction_count{instance=\"23.239.118.130:8998\",job=\"baskerville_exporter\",kind=\"regular\",target=\"www.btselem.org\"}": "dark-green",
@@ -131,7 +137,7 @@
       "repeat": null,
       "seriesOverrides": [],
       "spaceLength": 10,
-      "stack": true,
+      "stack": false,
       "steppedLine": false,
       "targets": [
         {
@@ -423,11 +429,11 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "semi-dark-red",
+                "color": "semi-dark-yellow",
                 "value": null
               },
               {
-                "color": "semi-dark-red",
+                "color": "semi-dark-yellow",
                 "value": 1
               }
             ]
@@ -819,6 +825,405 @@
       "timeShift": null,
       "title": "Passed Challenge",
       "type": "stat"
+    },
+    {
+      "columns": [],
+      "datasource": "${DS_POSTGRESQL}",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "fontSize": "100%",
+      "gridPos": {
+        "h": 9,
+        "w": 4,
+        "x": 0,
+        "y": 7
+      },
+      "id": 22,
+      "pageSize": null,
+      "showHeader": true,
+      "sort": {
+        "col": 0,
+        "desc": true
+      },
+      "styles": [
+        {
+          "alias": "Time",
+          "align": "left",
+          "dateFormat": "YYYY-MM-DD HH:mm:ss",
+          "pattern": "Time",
+          "type": "date"
+        },
+        {
+          "alias": "  ",
+          "align": "center",
+          "colorMode": null,
+          "colors": [
+            "#F2495C",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "decimals": 2,
+          "pattern": "/.*/",
+          "preserveFormat": true,
+          "thresholds": [],
+          "type": "string",
+          "unit": "short"
+        }
+      ],
+      "targets": [
+        {
+          "format": "table",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "SELECT distinct(ip)\nFROM request_sets WHERE $__timeFilter(stop) and target = '$Host' \nand prediction = 0 and challenged = 0\ngroup by 1 order by 1",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "",
+      "transform": "table",
+      "type": "table-old"
+    },
+    {
+      "columns": [],
+      "datasource": "${DS_POSTGRESQL}",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "fontSize": "100%",
+      "gridPos": {
+        "h": 9,
+        "w": 4,
+        "x": 4,
+        "y": 7
+      },
+      "id": 21,
+      "pageSize": 100,
+      "showHeader": true,
+      "sort": {
+        "col": null,
+        "desc": false
+      },
+      "styles": [
+        {
+          "alias": " ",
+          "align": "center",
+          "colorMode": null,
+          "colors": [
+            "#F2495C",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "decimals": 2,
+          "pattern": "/.*/",
+          "thresholds": [],
+          "type": "string",
+          "unit": "short"
+        }
+      ],
+      "targets": [
+        {
+          "format": "table",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "SELECT distinct(ip)\nFROM request_sets WHERE $__timeFilter(stop) and target = '$Host' \nand prediction = 1 and challenged = 0\ngroup by 1 order by 1",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "",
+      "transform": "table",
+      "type": "table-old"
+    },
+    {
+      "columns": [],
+      "datasource": "${DS_POSTGRESQL}",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "fontSize": "100%",
+      "gridPos": {
+        "h": 9,
+        "w": 4,
+        "x": 8,
+        "y": 7
+      },
+      "id": 23,
+      "pageSize": 100,
+      "showHeader": true,
+      "sort": {
+        "col": null,
+        "desc": false
+      },
+      "styles": [
+        {
+          "alias": "Time",
+          "align": "auto",
+          "dateFormat": "YYYY-MM-DD HH:mm:ss",
+          "pattern": "Time",
+          "type": "date"
+        },
+        {
+          "alias": "        ip",
+          "align": "left",
+          "colorMode": null,
+          "colors": [
+            "#F2495C",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "decimals": 2,
+          "pattern": "/.*/",
+          "thresholds": [],
+          "type": "string",
+          "unit": "short"
+        }
+      ],
+      "targets": [
+        {
+          "format": "table",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "SELECT distinct(ip)\nFROM request_sets WHERE $__timeFilter(stop) and target = '$Host' \nand challenged = 1 and low_rate_attack = 0\ngroup by 1 order by 1",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "",
+      "transform": "table",
+      "type": "table-old"
+    },
+    {
+      "columns": [],
+      "datasource": "${DS_POSTGRESQL}",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "fontSize": "100%",
+      "gridPos": {
+        "h": 9,
+        "w": 4,
+        "x": 12,
+        "y": 7
+      },
+      "id": 29,
+      "pageSize": 100,
+      "showHeader": true,
+      "sort": {
+        "col": null,
+        "desc": false
+      },
+      "styles": [
+        {
+          "alias": "Time",
+          "align": "auto",
+          "dateFormat": "YYYY-MM-DD HH:mm:ss",
+          "pattern": "Time",
+          "type": "date"
+        },
+        {
+          "alias": "        ip",
+          "align": "left",
+          "colorMode": null,
+          "colors": [
+            "#F2495C",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "decimals": 2,
+          "pattern": "/.*/",
+          "thresholds": [],
+          "type": "string",
+          "unit": "short"
+        }
+      ],
+      "targets": [
+        {
+          "format": "table",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "SELECT distinct(ip)\nFROM request_sets WHERE $__timeFilter(stop) and target = '$Host' \nand low_rate_attack = 1 and challenged = 1\ngroup by 1 order by 1",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "",
+      "transform": "table",
+      "type": "table-old"
+    },
+    {
+      "columns": [],
+      "datasource": "${DS_POSTGRESQL}",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "fontSize": "100%",
+      "gridPos": {
+        "h": 9,
+        "w": 4,
+        "x": 16,
+        "y": 7
+      },
+      "id": 32,
+      "pageSize": 100,
+      "showHeader": true,
+      "sort": {
+        "col": null,
+        "desc": false
+      },
+      "styles": [
+        {
+          "alias": "Time",
+          "align": "auto",
+          "dateFormat": "YYYY-MM-DD HH:mm:ss",
+          "pattern": "Time",
+          "type": "date"
+        },
+        {
+          "alias": "        ip",
+          "align": "left",
+          "colorMode": null,
+          "colors": [
+            "#F2495C",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "decimals": 2,
+          "pattern": "/.*/",
+          "thresholds": [],
+          "type": "string",
+          "unit": "short"
+        }
+      ],
+      "targets": [
+        {
+          "format": "table",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "SELECT distinct(ip)\nFROM request_sets WHERE $__timeFilter(stop) and target = '$Host' \nand challenged = 1 and challenge_passed = 1\ngroup by 1 order by 1",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "",
+      "transform": "table",
+      "type": "table-old"
     }
   ],
   "refresh": false,
@@ -882,7 +1287,7 @@
     ]
   },
   "timezone": "",
-  "title": "Traffic Light",
-  "uid": "IZ1PaFHGz",
-  "version": 6
+  "title": "Traffic Light (IPs)",
+  "uid": "IZ1PaFHG3",
+  "version": 2
 }
