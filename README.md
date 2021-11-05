@@ -21,12 +21,19 @@ cp dot_env.sh .env
 ```
 * set `CLEARING_HOUSE_KAFKA` variable to your Baskerville clearing house url
 * set `KAFKA_HOST` variable to your ip
+* set provided passwords `KAFKA_KEYSTORE_PASSWORD` and `KAFKA_TRUSTSTORE_PASSWORD`
 
 * add TLS keys provided by clearing house into 'clearing_house_connection' subfolder. 
 ```commandline
 ./clearing_house_connection/caroot.pem
 ./clearing_house_connection/certificate.pem
 ./clearing_house_connection/key.pem
+```
+
+* add local Kafka keys provided by clearing house into 'kafka_local' subfolder. 
+```commandline
+./conf/kafka_local/kafka.keystore.jks
+./conf/kafka_local/kafka.truststore.jks
 ```
 
 * By default, filebeat is using `./logs` folder. 
@@ -110,3 +117,6 @@ exit
 
 docker-compose restart baskerville_preprocessing baskerville_postprocessing
 ```
+
+### Firewall
+- open 29092 port for Kafka connections
