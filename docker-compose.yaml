@@ -82,7 +82,8 @@ services:
   zookeeper:
     image: bitnami/zookeeper:3.6.3
     environment:
-      - ALLOW_ANONYMOUS_LOGIN=yes
+      ALLOW_ANONYMOUS_LOGIN: "yes"
+      ZOO_TLS_CLIENT_AUTH: "none"
     expose:
       - "2181-2182"
 
