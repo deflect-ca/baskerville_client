@@ -18,7 +18,8 @@ Baskerville client is a client module which:
 # System requirements
 * Linux server with Docker already installed.
 * A minimum of 8GB of RAM is suggested.
-* Allow port number `29092` on the host's firewall for Kafka connections to and from the clearing house.
+* Allow TCP network traffic on port `29092` for the Kafka connection from the clearing house to the client.
+* Allow TCP network traffic on port `3000` for access to the Grafana dashboard.
 
 # Installation
 Download the Baskerville client software into the current working directory and change directories:
