@@ -158,6 +158,7 @@ services:
 
   redis:
     image: redis
+    user: "redis"
     env_file:
       - .env
     expose:
