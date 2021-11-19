@@ -1,18 +1,18 @@
 ---
 database:
   name: baskerville
-  user: !ENV ${DB_USER}
-  password: !ENV ${DB_PASSWORD}
-  host: !ENV ${DB_HOST}
-  port : !ENV ${DB_PORT}
+  user: !ENV ${DB_USER:postgres}
+  host: !ENV ${DB_HOST:localhost}
+  port: !ENV ${DB_PORT:5432}
+  password: !ENV ${DB_PASS:secret}
   type: 'postgres'
   data_partition: False
 
 user_details:
   username: 'admin'
   password: !ENV '${ADMIN_PASS}'
-  organization_uuid: 'test'
-  organization_name: 'test_org'
+  organization_uuid: !ENV '${ORG_UUID:test}'
+  organization_name: !ENV '${ORG_NAME:test_org}'
 
 engine:
   ttl: 600
@@ -120,10 +120,10 @@ spark:
   redis_host: !ENV ${REDIS_HOST}
   redis_password: !ENV ${REDIS_PASSWORD}
   redis_port: '6379'
-  jars: !ENV '/app/baskerville/data/jars/baskervilleSecurityFilter.jar,/app/baskerville/data/jars/shc-core-1.1.3-2.4-s_2.11.jar,/app/baskerville/data/jars/tiledb-spark-0.1.0.jar,/app/baskerville/data/jars/spark-redis_2.11-2.5.0-SNAPSHOT-jar-with-dependencies.jar,/app/baskerville/data/jars/spark-iforest-3.0.1.jar,/app/baskerville/data/jars/postgresql-42.2.4.jar,/app/baskerville/data/jars/spark-streaming-kafka-0-8-assembly_2.11-2.4.0.jar,/app/baskerville/data/jars/elasticsearch-spark-20_2.11-5.6.5.jar'
+  jars: !ENV '/app/baskerville/data/jars/spark-iforest-3.0.1.jar,/app/baskerville/data/jars/postgresql-42.2.4.jar,/app/baskerville/data/jars/spark-streaming-kafka-0-8-assembly_2.11-2.4.0.jar'
   session_timezone: 'UTC'
   shuffle_partitions: 12
-  spark_driver_memory: '8G'
+  spark_driver_memory: '4G'
   db_driver: 'org.postgresql.Driver'
   storage_level: 'OFF_HEAP'
   event_log: True

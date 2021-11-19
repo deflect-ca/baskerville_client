@@ -2,6 +2,9 @@ FROM python:3.6
 ARG BASKERVILLE_BRANCH
 ARG DASHBOARD_BRANCH
 
+ENV BASKERVILLE_ROOT '/app/baskerville'
+ENV BASKERVILLE_DASH_ROOT '/app/baskerville_dashboard'
+ENV REDIS_HOST 'redis'
 # TODO: The following installs spark-iforest, esretriever and baskerville
 # which takes a long time - mostly because of the different pyspark versions.
 
@@ -24,15 +27,15 @@ RUN apt-get update \
     && cd /app \
     && git clone --branch $DASHBOARD_BRANCH https://github.com/deflect-ca/baskerville_dashboard.git \
     && cd baskerville_dashboard/backend  \
-    && pip install . \
-
-ENV BASKERVILLE_ROOT '/app/baskerville'
-ENV BASKERVILLE_DASH_ROOT '/app/baskerville_dashboard'
+    && pip install .
 
 COPY ./config.yaml /app/baskerville_dashboard/backend/conf
 COPY ./baskerville.yaml /app/baskerville_dashboard/backend/conf
 
+RUN cd /app/baskerville_dashboard/backend/src/baskerville_dashboard
+WORKDIR /app/baskerville_dashboard/backend/src/baskerville_dashboard
+
 # socketio for Python includes a production grade web server:
-RUN cd /app/baskerville_dashboard/backend/src/baskerville_dashboard && python app.py
+CMD ["python", "app.py"]
 
 EXPOSE 5000

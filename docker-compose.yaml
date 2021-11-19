@@ -225,7 +225,6 @@ services:
       - redis
       - filebeat
 
-  # feedback pipeline
   baskerville_feedback:
     image: "${BASKERVILLE_IMAGE}"
     env_file:
@@ -300,8 +299,12 @@ services:
     build:
       context: ./containers/baskerville_dashboard/front-end
       dockerfile: Dockerfile
+      args:
+        - DASHBOARD_BRANCH=fine_tuning_dockerized_version
+        - API_BASE_URL=http://localhost:5000/api/1  # 'https://api.baskerville-dashboard.deflect.ca/api/1'
+        - SOCKET_URL=http://localhost:5000          # 'https://api.baskerville-dashboard.deflect.ca'
     ports:
-      - "3000:3000"
+      - "80:80"
 
   dashboard_backend:
     build:
@@ -310,11 +313,13 @@ services:
       args:
         - BASKERVILLE_BRANCH=dashboard_changes_pt2
         - DASHBOARD_BRANCH=fine_tuning_dockerized_version
+#    network_mode: "service:dashboard_frontend"
     ports:
       - "5000:5000"
     depends_on:
       - postgres
       - kafka
+      - redis
 
 volumes:
   postgres-data3:
