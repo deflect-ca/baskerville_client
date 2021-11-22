@@ -19,6 +19,7 @@ engine:
   use_kafka_for_sensitive_data: False
   kafka_send_by_partition: True
   use_storage_for_request_cache: False
+  ip_cache_pending_ttl: 300
   white_list_urls: []
   white_list_ips: []
   white_list_hosts: []
