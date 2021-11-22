@@ -1,4 +1,6 @@
+FROM openjdk:8
 FROM python:3.6
+
 ARG BASKERVILLE_BRANCH
 ARG DASHBOARD_BRANCH
 
@@ -7,6 +9,14 @@ ENV BASKERVILLE_DASH_ROOT '/app/baskerville_dashboard'
 ENV REDIS_HOST 'redis'
 # TODO: The following installs spark-iforest, esretriever and baskerville
 # which takes a long time - mostly because of the different pyspark versions.
+
+# Get jdk8 from previous stage https://docs.docker.com/develop/develop-images/multistage-build/
+COPY --from=openjdk:8 /usr/local/openjdk-8 /usr/local/openjdk-8
+
+# Set java path
+ENV JAVA_HOME /usr/local/openjdk-8
+ENV PATH $PATH:$JAVA_HOME/bin
+
 
 RUN apt-get update \
     && apt-get -y upgrade \
