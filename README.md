@@ -131,3 +131,27 @@ docker-compose exec kafka bash
 # the following will consume / display a few messages, just to make sure all is well
 /opt/bitnami/kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic deflect.logs --offset 6131 --partition 0
 ```
+
+### Dashboard
+Notes for the Baskerville dashboard:
+- The Dockerfile is heavy, as it is a multistage Dockerfile. It uses Nginx internally but, since we already have an nginx service
+it would be nice to have a common volume for the front-end to be served and proper networking for the backend to be served also (only for the web-sockets)
+- It has Baskerville as a dependency (with all that this entails, like esretriever, iforest pyspark etc, which means different pyspark versions with conflicts and a lot of build time)
+
+
+
+### Misc
+In case baskerville_preprocessing and baskerville_postprocessing fail to start because `baskerville` database does not exist:
+```bash
+docker-compose exec postgres bash
+psql
+CREATE DATABASE baskerville;
+\q
+exit
+
+docker-compose restart baskerville_preprocessing baskerville_postprocessing
+```
+
+### Firewall
+- open 29092 port for Kafka connections
+

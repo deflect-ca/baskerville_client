@@ -295,31 +295,28 @@ services:
 #      - "8080:8080"
     network_mode: "service:nginx"
 
-  dashboard_frontend:
+  dashboard:
     build:
-      context: ./containers/baskerville_dashboard/front-end
+      context: ./containers/baskerville_dashboard
       dockerfile: Dockerfile
       args:
         - DASHBOARD_BRANCH=fine_tuning_dockerized_version
         - API_BASE_URL=http://localhost:5000/api/1  # 'https://api.baskerville-dashboard.deflect.ca/api/1'
-        - SOCKET_URL=http://localhost:5000          # 'https://api.baskerville-dashboard.deflect.ca'
-    ports:
-      - "80:80"
-
-  dashboard_backend:
-    build:
-      context: ./containers/baskerville_dashboard/backend
-      dockerfile: Dockerfile
-      args:
+        - SOCKET_URL=http://127.0.0.1:5000          # 'https://api.baskerville-dashboard.deflect.ca'
         - BASKERVILLE_BRANCH=dashboard_changes_pt2
-        - DASHBOARD_BRANCH=fine_tuning_dockerized_version
-#    network_mode: "service:dashboard_frontend"
+        - REDIS_HOST=$REDIS_HOST
+        - DOCKER_KAFKA_HOST=$DOCKER_KAFKA_HOST
+        - DB_HOST=DB_HOST
     ports:
+      - "80:80"  # todo: this will conflict with nginx service.
       - "5000:5000"
+    #    network_mode: "service:dashboard_backend"
     depends_on:
       - postgres
       - kafka
       - redis
+    networks:
+      - local
 
 volumes:
   postgres-data3:
