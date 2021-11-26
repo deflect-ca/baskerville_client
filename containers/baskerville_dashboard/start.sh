@@ -1,0 +1,1 @@
+nginx && python app.py

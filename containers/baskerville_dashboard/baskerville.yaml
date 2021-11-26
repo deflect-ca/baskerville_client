@@ -1,0 +1,137 @@
+---
+database:
+  name: baskerville
+  user: !ENV ${DB_USER:postgres}
+  host: !ENV ${DB_HOST:127.0.0.1}
+  port: !ENV ${DB_PORT:5432}
+  password: !ENV ${DB_PASS:secret}
+  type: 'postgres'
+  db_driver: 'org.postgresql.Driver'
+  data_partition: False
+
+user_details:
+  username: 'admin'
+  password: !ENV '${ADMIN_PASS}'
+  organization_uuid: !ENV '${BASKERVILLE_CLIENT_ID:baskerville_client_x}'
+  organization_name: !ENV '${ORG_NAME:test_org}'
+
+engine:
+  ttl: 600
+  client_mode: True
+  id_client: !ENV '${BASKERVILLE_CLIENT_ID:baskerville_client_x}'
+  time_bucket: 15
+  storage_path: !ENV '${BASKERVILLE_ROOT}/data/'
+  metrics:
+    port: 8998
+    exported_dashboard_file: !ENV '${BASKERVILLE_ROOT}/data/metrics/Baskerville-metrics-dashboard.json'
+    performance:
+      pipeline:
+        - 'get_data'
+        - 'feature_extraction'
+        - 'group_by'
+        - 'predict'
+        - 'save'
+        - 'clean_cache'
+        - 'update'
+        - 'instantiate_spark_session'
+      request_set_cache:
+        - 'instantiate_cache'
+        - '__getitem__'
+        - '__contains__'
+        - 'clean'
+      features: True
+    progress: True
+  verbose: False
+  datetime_format: '%Y-%m-%d %H:%M:%S'
+  model_id: ''  #50
+  trigger_challenge: True
+  challenge_threshold: 0.2
+  challenge: False # 'ip'
+  min_num_requests: 50
+  extra_features:
+      - css_to_html_ratio
+      - image_to_html_ratio
+      - js_to_html_ratio
+      - minutes_total
+      - path_depth_average
+      - path_depth_variance
+      - payload_size_average
+      - payload_size_log_average
+      - request_interval_average
+      - request_interval_variance
+      - request_total
+      - response4xx_to_request_ratio
+      - top_page_to_request_ratio
+      - unique_path_rate
+      - unique_path_to_request_ratio
+      - unique_query_rate
+      - unique_query_to_unique_path_ratio
+      - unique_ua_rate
+  data_config:
+    parser: JSONLogSparkParser
+    schema: !ENV '${BASKERVILLE_ROOT}/data/samples/sample_feedback_schema.json'
+    group_by_cols:
+      - 'client_request_host'
+      - 'client_ip'
+    timestamp_column: '@timestamp'
+  logpath : !ENV '${BASKERVILLE_ROOT}/src/baskerville/logs/baskerville.log'
+  log_level: 'DEBUG'
+  cache_expire_time: 604800     # sec (604800 = 1 week)
+  cache_load_past: False        # Load past request sets or not
+  cache_lookup: True            # search cache for sessions
+  cross_reference: False        # search MISP for IPs
+  db_lookup: False              # search database for sessions
+  raw_log:
+    paths:
+      - !ENV '${BASKERVILLE_ROOT}/data/samples/test_data_1k.json' # 1k randomized logs
+  simulation:
+    sleep: False
+    verbose: True
+    log_file: !ENV '${BASKERVILLE_ROOT}/data/samples/test_data_1k.json' # 1k randomized logs
+
+kafka:
+  connection:
+    bootstrap_servers: !ENV '${DOCKER_KAFKA_HOST:0.0.0.0}'
+#  bootstrap_servers: !ENV ${KAFKA_HOST}
+  auto_offset_reset: 'smallest'
+  data_topic: 'feedback'
+  consume_predictions_topic: 'predictions'
+  predictions_topic: 'id_client.baskerville.predictions'
+  feedback_topic: 'feedback'
+  feedback_response_topic: 'test.feedback'  # uuid_org.feedback
+  register_topic: 'baskerville.register'
+  consume_group: 'baskerville'
+  publish_logs: 'baskerville.logs'
+  publish_stats: 'baskerville.stats'
+  publish_predictions: 'baskerville.predictions'
+
+spark:
+  app_name: 'Baskerville Dashboard'
+  master: 'local' #!ENV 'spark://${SPARK_MASTER_HOST}:7077'
+  parallelism: -1
+  log_conf: 'true'
+  log_level: 'ERROR'
+  redis_host: !ENV ${REDIS_HOST:redis}
+  redis_password: !ENV ${REDIS_PASSWORD:""}
+  redis_port: '6379'
+  jars: !ENV '${BASKERVILLE_ROOT}/data/jars/spark-redis_2.11-2.5.0-SNAPSHOT-jar-with-dependencies.jar,${BASKERVILLE_ROOT}/data/jars/spark-iforest-2.4.0.99.jar,${BASKERVILLE_ROOT}/data/jars/postgresql-42.2.4.jar,${BASKERVILLE_ROOT}/data/jars/spark-streaming-kafka-0-8-assembly_2.11-2.4.0.jar'
+  session_timezone: 'UTC'
+  shuffle_partitions: 12
+  spark_driver_memory: '8G'
+  db_driver: 'org.postgresql.Driver'
+  storage_level: 'OFF_HEAP'
+  event_log: True
+  auth_secret: 'TEST_SECRET'  #
+  ssl_enabled: False
+  ssl_truststore: !ENV '${BASKERVILLE_ROOT}/data/keystore/truststore'
+  ssl_truststore_password: !ENV ${TRUSTSTORE_PASS}
+  ssl_keystore: !ENV '${BASKERVILLE_ROOT}/data/keystore/keystore'
+  ssl_keystore_password: !ENV ${KEYSTORE_PASS}
+  ssl_keypassword: !ENV ${SSL_PASS}
+  serializer: 'org.apache.spark.serializer.KryoSerializer'
+  kryoserializer_buffer_max: '2024m'
+  kryoserializer_buffer: '1024k'
+  # https://spark.apache.org/docs/latest/tuning.html#tuning-data-structures
+  driver_java_options: '-Dio.netty.noPreferDirect=true -Dio.netty.allocator.type=unpooled -XX:+UseCompressedOops -XX:G1HeapRegionSize=10 -XX:+UseG1GC -XX:ParallelGCThreads=8 -XX:ConcGCThreads=2 -XX:InitiatingHeapOccupancyPercent=25 -XX:+UnlockDiagnosticVMOptions -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.port=1098'
+  executor_extra_java_options: '-Dio.netty.noPreferDirect=true -Dio.netty.allocator.type=unpooled -XX:+UseCompressedOops -XX:G1HeapRegionSize=10 -XX:+UseG1GC -XX:ParallelGCThreads=8 -XX:ConcGCThreads=2 -XX:InitiatingHeapOccupancyPercent=25 -XX:+PrintFlagsFinal -XX:+PrintReferenceGC -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCTimeStamps  -XX:+UnlockDiagnosticVMOptions -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.port=1098'
+

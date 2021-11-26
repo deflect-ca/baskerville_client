@@ -158,6 +158,7 @@ services:
 
   redis:
     image: redis
+    user: "redis"
     env_file:
       - .env
     expose:
@@ -224,6 +225,32 @@ services:
       - redis
       - filebeat
 
+  baskerville_feedback:
+    image: "${BASKERVILLE_IMAGE}"
+    env_file:
+      - .env
+    environment:
+      - DB_USER=${BASKERVILLE_POSTGRES_USER}
+      - DB_PASSWORD=${BASKERVILLE_POSTGRES_PASSWORD}
+      - DB_HOST=postgres
+      - DB_PORT=${BASKERVILLE_POSTGRES_PORT}
+      - KAFKA_HOST=${DOCKER_KAFKA_HOST}:9092
+      - REDIS_PASSWORD=""
+      - CLEARING_HOUSE_KAFKA=${CLEARING_HOUSE_KAFKA}
+    command: python3 /usr/local/baskerville/src/baskerville/main.py -c /app/baskerville/conf/feedback.yaml feedback
+    volumes:
+      - type: bind
+        source: ./conf
+        target: /app/baskerville/conf
+        read_only: true
+      - type: bind
+        source: ./clearing_house_connection
+        target: /app/baskerville/clearing_house_connection
+        read_only: true
+    depends_on:
+      - postgres
+      - kafka
+
   banjax-next:
     build:
       context: ./containers/banjax-next
@@ -268,6 +295,28 @@ services:
 #      - "8080:8080"
     network_mode: "service:nginx"
 
+  dashboard:
+    build:
+      context: ./containers/baskerville_dashboard
+      dockerfile: Dockerfile
+      args:
+        - DASHBOARD_BRANCH=fine_tuning_dockerized_version
+        - API_BASE_URL=http://localhost:5000/api/1  # 'https://api.baskerville-dashboard.deflect.ca/api/1'
+        - SOCKET_URL=http://127.0.0.1:5000          # 'https://api.baskerville-dashboard.deflect.ca'
+        - BASKERVILLE_BRANCH=dashboard_changes_pt2
+        - REDIS_HOST=$REDIS_HOST
+        - DOCKER_KAFKA_HOST=$DOCKER_KAFKA_HOST
+        - DB_HOST=DB_HOST
+    ports:
+      - "80:80"  # todo: this will conflict with nginx service.
+      - "5000:5000"
+    #    network_mode: "service:dashboard_backend"
+    depends_on:
+      - postgres
+      - kafka
+      - redis
+    networks:
+      - local
 
 volumes:
   postgres-data3:

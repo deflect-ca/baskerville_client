@@ -12,8 +12,15 @@ BASKERVILLE_POSTGRES_USER=postgres
 BASKERVILLE_POSTGRES_PASSWORD=changeme
 BASKERVILLE_POSTGRES_PORT=5432
 
+BASKERVILLE_CLIENT_ID='yourid'
+
 DEFLECT_DNET=dnet1
 GF_SECURITY_ADMIN_PASSWORD=Adm1nPa$$
+
+# for the dashboard
+JWT_SECRET=sosecret
+ADMIN_PASS=pass
+SECRET_KEY='a very very secret key preferably through an env variable'
 
 PROJECT_ROOT='/path/to/baskerville_client'
 
