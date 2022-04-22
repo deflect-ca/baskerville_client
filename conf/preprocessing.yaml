@@ -98,7 +98,7 @@ kafka:
     bootstrap_servers: !ENV '${KAFKA_HOST}'
 
   clearing_house_connection:
-      api_version: !ENV '${CLEARING_HOUSE_API_VERSION}'
+      api_version: '0.11.5'
       bootstrap_servers: !ENV '${CLEARING_HOUSE_KAFKA}'
       security_protocol: 'SSL'
       ssl_check_hostname: False
